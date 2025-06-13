@@ -28,6 +28,11 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
+import Testlib from './native/NativeTestlib';
+
+export function multiply(a: number, b: number): number {
+  return Testlib.multiply(a, b);
+}
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
@@ -78,10 +83,9 @@ function App(): React.JSX.Element {
         barStyle={isDarkMode ? 'light-content' : 'dark-content'}
         backgroundColor={backgroundStyle.backgroundColor}
       />
-      <ScrollView
-        style={backgroundStyle}>
+      <ScrollView style={backgroundStyle}>
         <View style={{paddingRight: safePadding}}>
-          <Header/>
+          <Header />
         </View>
         <View
           style={{
