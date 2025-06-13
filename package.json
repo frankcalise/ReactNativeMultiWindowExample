@@ -46,5 +46,16 @@
       "namespace": "ReactNativeMultiWindowExample",
       "template": "cpp-app"
     }
+  },
+  "codegenConfig": {
+    "name": "RNTestlibSpec",
+    "type": "modules",
+    "jsSrcsDir": "app/native",
+    "includesGeneratedCode": true,
+    "windows": {
+      "namespace": "testlibCodegen",
+      "outputDirectory": "windows/testlib/codegen",
+      "separateDataTypes": true
+    }
   }
 }
