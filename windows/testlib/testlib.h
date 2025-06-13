@@ -1,13 +1,12 @@
 #pragma once
 
-#include "pch.h"
-#include "resource.h"
+#include "../ReactNativeMultiWindowExample/pch.h"
+#include "../ReactNativeMultiWindowExample/resource.h"
 
-
-#if __has_include("../testlib/codegen/NativeTestlibDataTypes.g.h")
-  #include "../testlib/codegen/NativeTestlibDataTypes.g.h"
+#if __has_include("./codegen/NativeTestlibDataTypes.g.h")
+  #include "./codegen/NativeTestlibDataTypes.g.h"
 #endif
-#include "../testlib/codegen/NativeTestlibSpec.g.h"
+#include "./codegen/NativeTestlibSpec.g.h"
 
 #include "NativeModules.h"
 
