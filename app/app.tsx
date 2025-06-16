@@ -5,9 +5,11 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  TurboModuleRegistry,
+  NativeEventEmitter,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -24,16 +26,34 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+// Import and initialize the native menu turbo module
+import {} from 'react-native';
+import type {Spec as MenuModuleSpec} from './specs/NativeMenuModule';
+
+const MenuModule =
+  TurboModuleRegistry.getEnforcing<MenuModuleSpec>('MenuModule');
+const menuEmitter = new NativeEventEmitter(MenuModule);
+
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-import Testlib from './native/NativeTestlib';
+MenuModule.initializeMenu([
+  {
+    id: 'file',
+    label: 'File',
+    mnemonic: 'F',
+    submenu: [
+      {id: 'exit', label: 'Exit', accelerator: 'Alt+F4', mnemonic: 'X'},
+    ],
+  },
+]);
 
-export function multiply(a: number, b: number): number {
-  return Testlib.multiply(a, b);
-}
 function Section({children, title}: SectionProps): React.JSX.Element {
+  //   useEffect(() => {
+  //     // Build the native File menu with Exit
+  //   }, []);
+
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -77,6 +97,8 @@ function App(): React.JSX.Element {
    */
   const safePadding = '5%';
 
+  const usingFabric = global.nativeFabricUIManager != null;
+
   return (
     <View style={backgroundStyle}>
       <StatusBar
@@ -93,6 +115,7 @@ function App(): React.JSX.Element {
             paddingHorizontal: safePadding,
             paddingBottom: safePadding,
           }}>
+          <Section title="Using Fabric?">{usingFabric ? 'Yes' : 'No.'}</Section>
           <Section title="Step One">
             Edit <Text style={styles.highlight}>App.tsx</Text> to change this
             screen and then come back to see your edits.

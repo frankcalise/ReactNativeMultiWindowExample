@@ -8,7 +8,8 @@
 
 #include "NativeModules.h"
 
-#include "../testlib/testlib.h"
+#include "../RNModules/MenuModule/MenuModule.h" // Include the MenuModule header
+
 // A PackageProvider containing any turbo modules you define within this app project
 struct CompReactPackageProvider
     : winrt::implements<CompReactPackageProvider, winrt::Microsoft::ReactNative::IReactPackageProvider> {
