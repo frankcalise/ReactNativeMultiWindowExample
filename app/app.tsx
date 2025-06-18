@@ -16,6 +16,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Alert,
 } from 'react-native';
 
 import {
@@ -38,22 +39,7 @@ type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-MenuModule.initializeMenu([
-  {
-    id: 'file',
-    label: 'File',
-    mnemonic: 'F',
-    submenu: [
-      {id: 'exit', label: 'Exit', accelerator: 'Alt+F4', mnemonic: 'X'},
-    ],
-  },
-]);
-
 function Section({children, title}: SectionProps): React.JSX.Element {
-  //   useEffect(() => {
-  //     // Build the native File menu with Exit
-  //   }, []);
-
   const isDarkMode = useColorScheme() === 'dark';
   return (
     <View style={styles.sectionContainer}>
@@ -99,6 +85,39 @@ function App(): React.JSX.Element {
 
   const usingFabric = global.nativeFabricUIManager != null;
 
+  const [menuEvent, setMenuEvent] = React.useState<string>('');
+
+  useEffect(() => {
+    // const sub = menuEmitter.addListener('onMenuItemSelected', (id: string) => {
+    const sub = MenuModule.onMenuItemSelected((id: string) => {
+      console.log('⏩ onMenuItemSelected fired with id:', id);
+      setMenuEvent(id);
+    });
+
+    MenuModule.initializeMenu([
+      {
+        id: 'file',
+        label: '&File',
+        submenu: [
+          {
+            id: 'exit',
+            label: 'E&xit\tAlt+F4',
+          },
+        ],
+      },
+      {
+        id: 'help',
+        label: '&Help',
+        submenu: [{id: 'about', label: '&About\tF1'}],
+      },
+    ]);
+
+    // Cleanup the subscription on unmount
+    return () => {
+      sub.remove();
+    };
+  }, []);
+
   return (
     <View style={backgroundStyle}>
       <StatusBar
@@ -116,9 +135,8 @@ function App(): React.JSX.Element {
             paddingBottom: safePadding,
           }}>
           <Section title="Using Fabric?">{usingFabric ? 'Yes' : 'No.'}</Section>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+          <Section title="Menu Event">
+            {menuEvent ?? 'No menu event received yet.'}
           </Section>
           <Section title="See Your Changes">
             <ReloadInstructions />
