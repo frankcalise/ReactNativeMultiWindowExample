@@ -79,11 +79,15 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
   auto viewOptions{reactNativeWin32App.ReactViewOptions()};
   viewOptions.ComponentName(L"ReactNativeMultiWindowExample");
 
-  // Add the AppWindow to our property bag
-  auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
-  auto appWindowProperty = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
-  settings.Properties().Set(appWindowProperty, appWindow);
+
+  // Push appWindow to the ReactPropertyBag so that it can be accessed by the MenuModule
+  winrt::Microsoft::ReactNative::ReactPropertyBag(settings.Properties()).Set(
+      winrt::ReactNativeMultiWindowExample::implementation::MenuModule::AppWindowPropertyId(),
+      appWindow
+  );
 
   // Start the app
   reactNativeWin32App.Start();
 }
+
+

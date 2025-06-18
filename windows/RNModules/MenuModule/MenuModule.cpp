@@ -1,4 +1,4 @@
-#include "pch.h"
+#include <pch.h>
 #include "MenuModule.h"
 #include <NativeModules.h>
 #include <winrt/Microsoft.ReactNative.h>
@@ -59,7 +59,8 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
 			m_hwnd = reinterpret_cast<HWND>(hwnd);
             SubclassWindow();
         }
-        
+
+        // Create menu and submenus
         HMENU hMenuBar = CreateMenu();
         for (auto const& top : items) {
             // Create the drop-down
@@ -87,13 +88,7 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
     void MenuModule::exitApp() noexcept {
         // dispatch the exit on the UI thread
         m_reactContext.UIDispatcher().Post([=]() {
-            winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
-            auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
-            auto propName = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
-            winrt::Windows::Foundation::IInspectable boxed = pb.Handle().Get(propName);
-
-            auto appWindow = boxed.as<winrt::Microsoft::UI::Windowing::AppWindow>();
-
+            auto appWindow = winrt::Microsoft::ReactNative::ReactPropertyBag{ m_reactContext.Properties() }.Get(AppWindowPropertyId());
             appWindow.Destroy();
         });
     }

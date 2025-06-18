@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../ReactNativeMultiWindowExample/pch.h"
+#include <pch.h>
 
 #include <winrt/Microsoft.ReactNative.h>
 #include <windows.h>
@@ -34,6 +34,11 @@ struct MenuModule {
   REACT_EVENT(onMenuItemSelected, L"onMenuItemSelected");
   std::function<void(std::string)> onMenuItemSelected;
 
+  static const winrt::Microsoft::ReactNative::ReactPropertyId<winrt::Microsoft::UI::Windowing::AppWindow>& AppWindowPropertyId() noexcept {
+      static const winrt::Microsoft::ReactNative::ReactPropertyId<winrt::Microsoft::UI::Windowing::AppWindow> prop{ L"MenuModule", L"AppWindow" };
+      return prop;
+  }
+
 private:
   React::ReactContext                        m_reactContext;
   HWND                                       m_hwnd{ nullptr };
@@ -47,7 +52,6 @@ private:
   static LRESULT CALLBACK WndProcStatic(
       HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam
   ) noexcept;
-  LRESULT OnCommand(int id) noexcept;
 };
 
 } // namespace winrt::ReactNativeMultiWindowExample::implementation
