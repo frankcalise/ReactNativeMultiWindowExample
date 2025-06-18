@@ -88,10 +88,16 @@ function App(): React.JSX.Element {
   const [menuEvent, setMenuEvent] = React.useState<string>('');
 
   useEffect(() => {
-    // const sub = menuEmitter.addListener('onMenuItemSelected', (id: string) => {
     const sub = MenuModule.onMenuItemSelected((id: string) => {
-      console.log('⏩ onMenuItemSelected fired with id:', id);
       setMenuEvent(id);
+      if (id === 'exit') {
+        MenuModule.exitApp();
+      } else if (id === 'about') {
+        Alert.alert(
+          'About',
+          'This is a sample React Native app with a native menu.',
+        );
+      }
     });
 
     MenuModule.initializeMenu([

@@ -32,7 +32,7 @@ struct MenuModule {
   void addListener(std::string const &eventName) noexcept;
   REACT_METHOD(removeListeners)
   void removeListeners(double count) noexcept;
-  REACT_EVENT(onMenuItemSelected)
+  REACT_EVENT(onMenuItemSelected, L"onMenuItemSelected");
   std::function<void(std::string)> onMenuItemSelected;
 
 private:
@@ -41,7 +41,6 @@ private:
   WNDPROC                                    m_oldProc{ nullptr };
   int                                        m_lastCmdId{ 100 };
   std::map<int, std::string>                 m_idMap;
-  int                                        m_listenerCount{ 0 };
 
   // Helper to subclass the window proc once the HWND is set
   void SubclassWindow() noexcept;

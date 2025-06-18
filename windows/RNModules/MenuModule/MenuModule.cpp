@@ -6,23 +6,10 @@
 #include <string>
 
 namespace winrt::ReactNativeMultiWindowExample::implementation {
-    constexpr int IDM_EXIT = 1;
-
     MenuModule::MenuModule() noexcept {}
 
     void MenuModule::Initialize(React::ReactContext const &reactContext) noexcept {
       m_reactContext = reactContext;
-    }
-
-    LRESULT MenuModule::OnCommand(int id) noexcept {
-        switch (id) {
-            case IDM_EXIT:
-                exitApp();
-                return 0;
-
-        default:
-            return 1;
-        }
     }
 
     LRESULT CALLBACK MenuModule::WndProcStatic(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam) noexcept {
@@ -39,8 +26,8 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
             // pull out the command ID
             int cmd = LOWORD(wparam);
             auto it = self->m_idMap.find(cmd);
-            if (it != self->m_idMap.end() && self->m_listenerCount > 0) {
-                self->onMenuItemSelected(it->second);
+            if (it != self->m_idMap.end()) {
+                self->onMenuItemSelected({ it->second });
             }
             return 0;  // we handled the menu click
         }
@@ -109,14 +96,10 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
     }
 
     void MenuModule::addListener(std::string const &eventName) noexcept {
-    // React Native will call this any time JS does: emitter.addListener('onMenuItemSelected', …)
-        if (eventName == "onMenuItemSelected") {
-            m_listenerCount++;
-        }
+        // noop
     }
 
     void MenuModule::removeListeners(double count) noexcept {
-        // And this when JS removes subscriptions
-        m_listenerCount = std::max<int32_t>(0, m_listenerCount - static_cast<int32_t>(count));
+        // noop
     }
 } // namespace winrt::ReactNativeMultiWindowExample::implementation
