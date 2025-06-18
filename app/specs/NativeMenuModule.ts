@@ -1,6 +1,7 @@
 // specs/NativeMenuModule.ts
 import type {TurboModule} from 'react-native';
 import {TurboModuleRegistry} from 'react-native';
+import {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
 
 /**
  * Sub-menu items have no further nesting.
@@ -10,10 +11,6 @@ export type SubMenuItem = {
   id: string;
   /** visible label */
   label: string;
-  /** optional “Ctrl+X” style shortcut */
-  accelerator?: string;
-  /** optional single mnemonic character */
-  mnemonic?: string;
 };
 
 /**
@@ -23,8 +20,6 @@ export type SubMenuItem = {
 export type TopMenuItem = {
   id: string;
   label: string;
-  accelerator?: string;
-  mnemonic?: string;
   submenu: SubMenuItem[];
 };
 
@@ -43,8 +38,13 @@ export interface Spec extends TurboModule {
 
   /** Required: remove listeners when JS side cleans up */
   removeListeners(count: number): void;
+
+  /**
+   * Set a listener for menu item selection events.
+   * This is only needed if you want to handle menu selections in JS.
+   */
+  readonly onMenuItemSelected: EventEmitter<string>;
 }
 
-export default TurboModuleRegistry.getEnforcing<Spec>(
-  'MenuModule' /* must match your native registration name */,
-);
+const MenuTurboModule = TurboModuleRegistry.getEnforcing<Spec>('MenuModule');
+export default MenuTurboModule;

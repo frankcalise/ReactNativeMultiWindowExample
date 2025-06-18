@@ -19,8 +19,6 @@ inline winrt::Microsoft::ReactNative::FieldMap GetStructInfo(MenuModuleSpec_SubM
     winrt::Microsoft::ReactNative::FieldMap fieldMap {
         {L"id", &MenuModuleSpec_SubMenuItem::id},
         {L"label", &MenuModuleSpec_SubMenuItem::label},
-        {L"accelerator", &MenuModuleSpec_SubMenuItem::accelerator},
-        {L"mnemonic", &MenuModuleSpec_SubMenuItem::mnemonic},
     };
     return fieldMap;
 }
@@ -29,8 +27,6 @@ inline winrt::Microsoft::ReactNative::FieldMap GetStructInfo(MenuModuleSpec_TopM
     winrt::Microsoft::ReactNative::FieldMap fieldMap {
         {L"id", &MenuModuleSpec_TopMenuItem::id},
         {L"label", &MenuModuleSpec_TopMenuItem::label},
-        {L"accelerator", &MenuModuleSpec_TopMenuItem::accelerator},
-        {L"mnemonic", &MenuModuleSpec_TopMenuItem::mnemonic},
         {L"submenu", &MenuModuleSpec_TopMenuItem::submenu},
     };
     return fieldMap;
@@ -42,6 +38,7 @@ struct MenuModuleSpec : winrt::Microsoft::ReactNative::TurboModuleSpec {
       Method<void() noexcept>{1, L"exitApp"},
       Method<void(std::string) noexcept>{2, L"addListener"},
       Method<void(double) noexcept>{3, L"removeListeners"},
+      EventEmitter<void(std::string)>{4, L"onMenuItemSelected"},
   };
 
   template <class TModule>
@@ -68,6 +65,10 @@ struct MenuModuleSpec : winrt::Microsoft::ReactNative::TurboModuleSpec {
           "removeListeners",
           "    REACT_METHOD(removeListeners) void removeListeners(double count) noexcept { /* implementation */ }\n"
           "    REACT_METHOD(removeListeners) static void removeListeners(double count) noexcept { /* implementation */ }\n");
+    REACT_SHOW_EVENTEMITTER_SPEC_ERRORS(
+          4,
+          "onMenuItemSelected",
+          "    REACT_EVENT(onMenuItemSelected) std::function<void(std::string)> onMenuItemSelected;\n");
   }
 };
 

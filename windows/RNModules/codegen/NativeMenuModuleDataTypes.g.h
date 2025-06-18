@@ -19,15 +19,11 @@ namespace RNModulesCodegen {
 struct MenuModuleSpec_SubMenuItem {
     std::string id;
     std::string label;
-    std::optional<std::string> accelerator;
-    std::optional<std::string> mnemonic;
 };
 
 struct MenuModuleSpec_TopMenuItem {
     std::string id;
     std::string label;
-    std::optional<std::string> accelerator;
-    std::optional<std::string> mnemonic;
     std::vector<MenuModuleSpec_SubMenuItem> submenu;
 };
 

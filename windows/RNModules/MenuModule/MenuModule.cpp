@@ -2,10 +2,7 @@
 #include "MenuModule.h"
 #include <NativeModules.h>
 #include <winrt/Microsoft.ReactNative.h>
-#include <winrt/Microsoft.UI.Xaml.h>           // for Window::Current()
-#include <microsoft.ui.xaml.window.h>          // for ::IWindowNative
 #include <windows.h>
-#include <map>
 #include <string>
 
 namespace winrt::ReactNativeMultiWindowExample::implementation {
@@ -34,18 +31,18 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
         );
 
         if (!self) {
-            // shouldn�t happen, but fall back
+            // shouldn't happen, but fall back
             return DefWindowProc(hwnd, message, wparam, lparam);
         }
 
         if (message == WM_COMMAND) {
             // pull out the command ID
             int cmd = LOWORD(wparam);
-            // dispatch to your member handler
-            LRESULT result = self->OnCommand(cmd);
-            if (result != 1) {
-                return 0;
+            auto it = self->m_idMap.find(cmd);
+            if (it != self->m_idMap.end() && self->m_listenerCount > 0) {
+                self->onMenuItemSelected(it->second);
             }
+            return 0;  // we handled the menu click
         }
 
         return DefWindowProc(hwnd, message, wparam, lparam);
@@ -66,8 +63,6 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
 
     void MenuModule::initializeMenu(
       std::vector<RNModulesCodegen::MenuModuleSpec_TopMenuItem> const &items) noexcept {
-        // TODO: parse items into HMENU, AppendMenuW, etc.
-
         // 1) First time only: grab HWND & subclass
         if (!m_hwnd) {
             uint64_t hwnd = 0;
@@ -78,26 +73,50 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
             SubclassWindow();
         }
         
-        // 2) Build the menu bar
         HMENU hMenuBar = CreateMenu();
-        HMENU hFileMenu = CreatePopupMenu();
-            
-        AppendMenuW(hFileMenu, MF_STRING, IDM_EXIT, L"E&xit");
-        AppendMenuW(hMenuBar, MF_POPUP, reinterpret_cast<UINT_PTR>(hFileMenu), L"&File");
+        for (auto const& top : items) {
+            // Create the drop-down
+            HMENU hSub = CreatePopupMenu();
+            for (auto const& sub : top.submenu) {
+                // Assign a unique cmd ID and remember its JS id
+                int cmdId = ++m_lastCmdId;
+                m_idMap[cmdId] = sub.id;
 
+                AppendMenuW(hSub, MF_STRING, cmdId, winrt::to_hstring(sub.label).c_str());
+            }
+
+            // Attach this submenu under the top label
+            AppendMenuW(hMenuBar, MF_POPUP,
+                reinterpret_cast<UINT_PTR>(hSub),
+                winrt::to_hstring(top.label).c_str()
+            );
+        }
+
+        // 3) Set it on the window
         SetMenu(m_hwnd, hMenuBar);
         DrawMenuBar(m_hwnd);
     }
 
     void MenuModule::exitApp() noexcept {
-      PostMessageW(m_hwnd, WM_CLOSE, 0, 0);
+        winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
+        auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
+        auto propName = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
+        winrt::Windows::Foundation::IInspectable boxed = pb.Handle().Get(propName);
+
+        auto appWindow = boxed.as<winrt::Microsoft::UI::Windowing::AppWindow>();
+
+        appWindow.Destroy();
     }
 
     void MenuModule::addListener(std::string const &eventName) noexcept {
-      // No-op or track listener count
+    // React Native will call this any time JS does: emitter.addListener('onMenuItemSelected', …)
+        if (eventName == "onMenuItemSelected") {
+            m_listenerCount++;
+        }
     }
 
     void MenuModule::removeListeners(double count) noexcept {
-      // No-op or cleanup
+        // And this when JS removes subscriptions
+        m_listenerCount = std::max<int32_t>(0, m_listenerCount - static_cast<int32_t>(count));
     }
 } // namespace winrt::ReactNativeMultiWindowExample::implementation
