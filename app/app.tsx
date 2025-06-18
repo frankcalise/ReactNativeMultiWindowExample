@@ -5,15 +5,18 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  TurboModuleRegistry,
+  NativeEventEmitter,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
   useColorScheme,
   View,
+  Alert,
 } from 'react-native';
 
 import {
@@ -24,15 +27,18 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
+// Import and initialize the native menu turbo module
+import {} from 'react-native';
+import type {Spec as MenuModuleSpec} from './specs/NativeMenuModule';
+
+const MenuModule =
+  TurboModuleRegistry.getEnforcing<MenuModuleSpec>('MenuModule');
+const menuEmitter = new NativeEventEmitter(MenuModule);
+
 type SectionProps = PropsWithChildren<{
   title: string;
 }>;
 
-import Testlib from './native/NativeTestlib';
-
-export function multiply(a: number, b: number): number {
-  return Testlib.multiply(a, b);
-}
 function Section({children, title}: SectionProps): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
   return (
@@ -77,6 +83,41 @@ function App(): React.JSX.Element {
    */
   const safePadding = '5%';
 
+  const usingFabric = global.nativeFabricUIManager != null;
+
+  const [menuEvent, setMenuEvent] = React.useState<string>('');
+
+  useEffect(() => {
+    // const sub = menuEmitter.addListener('onMenuItemSelected', (id: string) => {
+    const sub = MenuModule.onMenuItemSelected((id: string) => {
+      console.log('⏩ onMenuItemSelected fired with id:', id);
+      setMenuEvent(id);
+    });
+
+    MenuModule.initializeMenu([
+      {
+        id: 'file',
+        label: '&File',
+        submenu: [
+          {
+            id: 'exit',
+            label: 'E&xit\tAlt+F4',
+          },
+        ],
+      },
+      {
+        id: 'help',
+        label: '&Help',
+        submenu: [{id: 'about', label: '&About\tF1'}],
+      },
+    ]);
+
+    // Cleanup the subscription on unmount
+    return () => {
+      sub.remove();
+    };
+  }, []);
+
   return (
     <View style={backgroundStyle}>
       <StatusBar
@@ -93,9 +134,9 @@ function App(): React.JSX.Element {
             paddingHorizontal: safePadding,
             paddingBottom: safePadding,
           }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
+          <Section title="Using Fabric?">{usingFabric ? 'Yes' : 'No.'}</Section>
+          <Section title="Menu Event">
+            {menuEvent ?? 'No menu event received yet.'}
           </Section>
           <Section title="See Your Changes">
             <ReloadInstructions />

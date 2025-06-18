@@ -48,13 +48,13 @@
     }
   },
   "codegenConfig": {
-    "name": "RNTestlibSpec",
+    "name": "RNModulesSpec",
     "type": "modules",
-    "jsSrcsDir": "app/native",
+    "jsSrcsDir": "app/specs",
     "includesGeneratedCode": true,
     "windows": {
-      "namespace": "testlibCodegen",
-      "outputDirectory": "windows/testlib/codegen",
+      "namespace": "RNModulesCodegen",
+      "outputDirectory": "windows/RNModules/codegen",
       "separateDataTypes": true
     }
   }

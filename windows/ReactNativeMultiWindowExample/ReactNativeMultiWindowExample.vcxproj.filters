@@ -30,7 +30,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="../testlib/testlib.h">
+    <ClInclude Include="..\RNModules\MenuModule\MenuModule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="../testlib/testlib.cpp">
+    <ClCompile Include="..\RNModules\MenuModule\MenuModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

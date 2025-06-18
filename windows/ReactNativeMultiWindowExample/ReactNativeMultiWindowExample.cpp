@@ -8,7 +8,8 @@
 
 #include "NativeModules.h"
 
-#include "../testlib/testlib.h"
+#include "../RNModules/MenuModule/MenuModule.h" // Include the MenuModule header
+
 // A PackageProvider containing any turbo modules you define within this app project
 struct CompReactPackageProvider
     : winrt::implements<CompReactPackageProvider, winrt::Microsoft::ReactNative::IReactPackageProvider> {
@@ -77,6 +78,11 @@ _Use_decl_annotations_ int CALLBACK WinMain(HINSTANCE instance, HINSTANCE, PSTR 
   // Get the ReactViewOptions so we can set the initial RN component to load
   auto viewOptions{reactNativeWin32App.ReactViewOptions()};
   viewOptions.ComponentName(L"ReactNativeMultiWindowExample");
+
+  // Add the AppWindow to our property bag
+  auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
+  auto appWindowProperty = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
+  settings.Properties().Set(appWindowProperty, appWindow);
 
   // Start the app
   reactNativeWin32App.Start();
