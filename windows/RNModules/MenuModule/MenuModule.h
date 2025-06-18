@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../../ReactNativeMultiWindowExample/pch.h"
-#include "../../ReactNativeMultiWindowExample/resource.h"
 
 #include <winrt/Microsoft.ReactNative.h>
 #include <windows.h>

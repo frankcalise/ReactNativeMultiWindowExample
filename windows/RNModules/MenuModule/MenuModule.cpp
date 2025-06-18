@@ -85,14 +85,17 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
     }
 
     void MenuModule::exitApp() noexcept {
-        winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
-        auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
-        auto propName = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
-        winrt::Windows::Foundation::IInspectable boxed = pb.Handle().Get(propName);
+        // dispatch the exit on the UI thread
+        m_reactContext.UIDispatcher().Post([=]() {
+            winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
+            auto menuModuleNs = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetNamespace(L"MenuModule");
+            auto propName = winrt::Microsoft::ReactNative::ReactPropertyBagHelper::GetName(menuModuleNs, L"AppWindow");
+            winrt::Windows::Foundation::IInspectable boxed = pb.Handle().Get(propName);
 
-        auto appWindow = boxed.as<winrt::Microsoft::UI::Windowing::AppWindow>();
+            auto appWindow = boxed.as<winrt::Microsoft::UI::Windowing::AppWindow>();
 
-        appWindow.Destroy();
+            appWindow.Destroy();
+        });
     }
 
     void MenuModule::addListener(std::string const &eventName) noexcept {
