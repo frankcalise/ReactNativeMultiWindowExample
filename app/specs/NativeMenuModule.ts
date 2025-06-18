@@ -4,10 +4,10 @@ import {TurboModuleRegistry} from 'react-native';
 import {EventEmitter} from 'react-native/Libraries/Types/CodegenTypes';
 
 /**
- * Sub-menu items have no further nesting.
+ * Sub-menu items
  */
 export type SubMenuItem = {
-  /** unique JS ID */
+  type: 'item' | 'separator';
   id: string;
   /** visible label */
   label: string;

@@ -17,6 +17,7 @@ namespace RNModulesCodegen {
 
 inline winrt::Microsoft::ReactNative::FieldMap GetStructInfo(MenuModuleSpec_SubMenuItem*) noexcept {
     winrt::Microsoft::ReactNative::FieldMap fieldMap {
+        {L"type", &MenuModuleSpec_SubMenuItem::type},
         {L"id", &MenuModuleSpec_SubMenuItem::id},
         {L"label", &MenuModuleSpec_SubMenuItem::label},
     };

@@ -17,6 +17,7 @@
 namespace RNModulesCodegen {
 
 struct MenuModuleSpec_SubMenuItem {
+    std::string type;
     std::string id;
     std::string label;
 };

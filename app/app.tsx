@@ -9,7 +9,6 @@ import React, {useEffect} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   TurboModuleRegistry,
-  NativeEventEmitter,
   ScrollView,
   StatusBar,
   StyleSheet,
@@ -33,7 +32,6 @@ import type {Spec as MenuModuleSpec} from './specs/NativeMenuModule';
 
 const MenuModule =
   TurboModuleRegistry.getEnforcing<MenuModuleSpec>('MenuModule');
-const menuEmitter = new NativeEventEmitter(MenuModule);
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -106,6 +104,7 @@ function App(): React.JSX.Element {
         label: '&File',
         submenu: [
           {
+            type: 'item',
             id: 'exit',
             label: 'E&xit\tAlt+F4',
           },
@@ -114,7 +113,11 @@ function App(): React.JSX.Element {
       {
         id: 'help',
         label: '&Help',
-        submenu: [{id: 'about', label: '&About\tF1'}],
+        submenu: [
+          {type: 'item', id: 'updates', label: 'Check for updates...'},
+          {type: 'separator'},
+          {type: 'item', id: 'about', label: '&About\tF1'},
+        ],
       },
     ]);
 

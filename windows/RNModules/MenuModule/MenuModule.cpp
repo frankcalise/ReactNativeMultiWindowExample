@@ -67,10 +67,14 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
             HMENU hSub = CreatePopupMenu();
             for (auto const& sub : top.submenu) {
                 // Assign a unique cmd ID and remember its JS id
-                int cmdId = ++m_lastCmdId;
-                m_idMap[cmdId] = sub.id;
-
-                AppendMenuW(hSub, MF_STRING, cmdId, winrt::to_hstring(sub.label).c_str());
+                if (sub.type == "separator") {
+                    AppendMenuW(hSub, MF_SEPARATOR, 0, nullptr);
+                } else {
+                    int cmdId = ++m_lastCmdId;
+                    m_idMap[cmdId] = sub.id;
+    
+                    AppendMenuW(hSub, MF_STRING, cmdId, winrt::to_hstring(sub.label).c_str());
+                }
             }
 
             // Attach this submenu under the top label
