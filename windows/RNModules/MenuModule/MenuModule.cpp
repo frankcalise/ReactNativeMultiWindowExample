@@ -48,45 +48,8 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
       }
     }
 
-    void MenuModule::initializeMenu(
-      std::vector<RNModulesCodegen::MenuModuleSpec_TopMenuItem> const &items) noexcept {
-        // 1) First time only: grab HWND & subclass
-        if (!m_hwnd) {
-            uint64_t hwnd = 0;
-            winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
-            hwnd = winrt::Microsoft::ReactNative::ReactCoreInjection::GetTopLevelWindowId(pb.Handle());
-            if (!hwnd) return;
-			m_hwnd = reinterpret_cast<HWND>(hwnd);
-            SubclassWindow();
-        }
-
-        // Create menu and submenus
-        HMENU hMenuBar = CreateMenu();
-        for (auto const& top : items) {
-            // Create the drop-down
-            HMENU hSub = CreatePopupMenu();
-            for (auto const& sub : top.submenu) {
-                // Assign a unique cmd ID and remember its JS id
-                if (sub.type == "separator") {
-                    AppendMenuW(hSub, MF_SEPARATOR, 0, nullptr);
-                } else {
-                    int cmdId = ++m_lastCmdId;
-                    m_idMap[cmdId] = sub.id;
-    
-                    AppendMenuW(hSub, MF_STRING, cmdId, winrt::to_hstring(sub.label).c_str());
-                }
-            }
-
-            // Attach this submenu under the top label
-            AppendMenuW(hMenuBar, MF_POPUP,
-                reinterpret_cast<UINT_PTR>(hSub),
-                winrt::to_hstring(top.label).c_str()
-            );
-        }
-
-        // 3) Set it on the window
-        SetMenu(m_hwnd, hMenuBar);
-        DrawMenuBar(m_hwnd);
+    void MenuModule::initializeMenu(std::vector<RNModulesCodegen::MenuModuleSpec_TopMenuItem> const& items) noexcept {
+      // noop
     }
 
     void MenuModule::exitApp() noexcept {
@@ -103,5 +66,81 @@ namespace winrt::ReactNativeMultiWindowExample::implementation {
 
     void MenuModule::removeListeners(double count) noexcept {
         // noop
+    }
+
+    // --- Primitive Menu API Implementation ---
+    void MenuModule::clearMenu() noexcept {
+        if (!m_hwnd) {
+            // Initialize HWND if needed
+            uint64_t hwnd = 0;
+            winrt::Microsoft::ReactNative::ReactPropertyBag pb{ m_reactContext.Properties() };
+            hwnd = winrt::Microsoft::ReactNative::ReactCoreInjection::GetTopLevelWindowId(pb.Handle());
+            if (!hwnd) return;
+            m_hwnd = reinterpret_cast<HWND>(hwnd);
+            SubclassWindow();
+        }
+        SetMenu(m_hwnd, nullptr);
+        if (m_menuBar) {
+            DestroyMenu(m_menuBar);
+        }
+        m_menuBar = CreateMenu();
+        m_menuMap.clear();
+        m_idMap.clear();
+        m_lastCmdId = 100;
+        DrawMenuBar(m_hwnd);
+    }
+
+    void MenuModule::addMenu(std::string const &id, std::string const &label) noexcept {
+        if (!m_menuBar) return;
+        HMENU hSub = CreatePopupMenu();
+        m_menuMap[id] = hSub;
+        AppendMenuW(m_menuBar, MF_POPUP, (UINT_PTR)hSub, winrt::to_hstring(label).c_str());
+        SetMenu(m_hwnd, m_menuBar);
+        DrawMenuBar(m_hwnd);
+    }
+
+    void MenuModule::addSubMenu(std::string const &parentId, std::string const &id, std::string const &label) noexcept {
+        auto it = m_menuMap.find(parentId);
+        if (it == m_menuMap.end()) return;
+        HMENU parentHMenu = it->second;
+        HMENU childHMenu = CreatePopupMenu();
+        m_menuMap[id] = childHMenu;
+        AppendMenuW(parentHMenu, MF_POPUP, (UINT_PTR)childHMenu, winrt::to_hstring(label).c_str());
+        SetMenu(m_hwnd, m_menuBar);
+        DrawMenuBar(m_hwnd);
+    }
+
+    void MenuModule::addItem(std::string const &parentId, std::string const &id, std::string const &label) noexcept {
+        auto it = m_menuMap.find(parentId);
+        if (it == m_menuMap.end()) return;
+        HMENU parentHMenu = it->second;
+        int cmdId = ++m_lastCmdId;
+        m_idMap[cmdId] = id;
+        AppendMenuW(parentHMenu, MF_STRING, cmdId, winrt::to_hstring(label).c_str());
+        SetMenu(m_hwnd, m_menuBar);
+        DrawMenuBar(m_hwnd);
+    }
+
+    void MenuModule::addSeparator(std::string const &parentId) noexcept {
+        auto it = m_menuMap.find(parentId);
+        if (it == m_menuMap.end()) return;
+        HMENU parentHMenu = it->second;
+        AppendMenuW(parentHMenu, MF_SEPARATOR, 0, nullptr);
+        SetMenu(m_hwnd, m_menuBar);
+        DrawMenuBar(m_hwnd);
+    }
+
+    void MenuModule::enableMenu(std::string const &id, bool enabled) noexcept {
+        // Find the cmdId for this id
+        int foundCmdId = -1;
+        for (const auto& pair : m_idMap) {
+            if (pair.second == id) {
+                foundCmdId = pair.first;
+                break;
+            }
+        }
+        if (foundCmdId == -1) return;
+        EnableMenuItem(m_menuBar, foundCmdId, MF_BYCOMMAND | (enabled ? MF_ENABLED : MF_GRAYED));
+        DrawMenuBar(m_hwnd);
     }
 } // namespace winrt::ReactNativeMultiWindowExample::implementation
