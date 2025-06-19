@@ -98,28 +98,18 @@ function App(): React.JSX.Element {
       }
     });
 
-    MenuModule.initializeMenu([
-      {
-        id: 'file',
-        label: '&File',
-        submenu: [
-          {
-            type: 'item',
-            id: 'exit',
-            label: 'E&xit\tAlt+F4',
-          },
-        ],
-      },
-      {
-        id: 'help',
-        label: '&Help',
-        submenu: [
-          {type: 'item', id: 'updates', label: 'Check for updates...'},
-          {type: 'separator'},
-          {type: 'item', id: 'about', label: '&About\tF1'},
-        ],
-      },
-    ]);
+    // Build menu bar using primitives
+    MenuModule.clearMenu();
+
+    // File menu
+    MenuModule.addMenu('file', '&File');
+    MenuModule.addItem('file', 'exit', 'E&xit\tAlt+F4');
+
+    // Help menu
+    MenuModule.addMenu('help', '&Help');
+    MenuModule.addItem('help', 'updates', 'Check for updates...');
+    MenuModule.addSeparator('help');
+    MenuModule.addItem('help', 'about', '&About\tF1');
 
     // Cleanup the subscription on unmount
     return () => {
