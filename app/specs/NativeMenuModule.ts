@@ -27,8 +27,50 @@ export interface Spec extends TurboModule {
   /**
    * (Re)build the entire menu bar, including optional accelerators and mnemonics.
    * @param items an array of top-level menu items
+   * @deprecated Use primitives (clearMenu, addMenu, etc.) instead.
    */
   initializeMenu(items: Array<TopMenuItem>): void;
+
+  /**
+   * Remove all menus and reset the menu bar.
+   */
+  clearMenu(): void;
+
+  /**
+   * Add a top-level menu to the menu bar.
+   * @param id Unique menu id
+   * @param label Menu label (may include & for mnemonics)
+   */
+  addMenu(id: string, label: string): void;
+
+  /**
+   * Add a submenu to a parent menu.
+   * @param parentId Id of the parent menu
+   * @param id Unique submenu id
+   * @param label Submenu label
+   */
+  addSubMenu(parentId: string, id: string, label: string): void;
+
+  /**
+   * Add an item to a parent menu or submenu.
+   * @param parentId Id of the parent menu or submenu
+   * @param id Unique item id
+   * @param label Item label
+   */
+  addItem(parentId: string, id: string, label: string): void;
+
+  /**
+   * Add a separator to a parent menu or submenu.
+   * @param parentId Id of the parent menu or submenu
+   */
+  addSeparator(parentId: string): void;
+
+  /**
+   * Enable or disable a menu item by id.
+   * @param id Item id
+   * @param enabled True to enable, false to disable
+   */
+  enableMenu(id: string, enabled: boolean): void;
 
   /** Convenience method: force an app-exit on the native side */
   exitApp(): void;

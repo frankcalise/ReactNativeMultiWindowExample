@@ -25,6 +25,18 @@ struct MenuModule {
   // Spec methods
   REACT_METHOD(initializeMenu)
   void initializeMenu(std::vector<RNModulesCodegen::MenuModuleSpec_TopMenuItem> const &items) noexcept;
+  REACT_METHOD(clearMenu)
+  void clearMenu() noexcept;
+  REACT_METHOD(addMenu)
+  void addMenu(std::string const &id, std::string const &label) noexcept;
+  REACT_METHOD(addSubMenu)
+  void addSubMenu(std::string const &parentId, std::string const &id, std::string const &label) noexcept;
+  REACT_METHOD(addItem)
+  void addItem(std::string const &parentId, std::string const &id, std::string const &label) noexcept;
+  REACT_METHOD(addSeparator)
+  void addSeparator(std::string const &parentId) noexcept;
+  REACT_METHOD(enableMenu)
+  void enableMenu(std::string const &id, bool enabled) noexcept;
   REACT_METHOD(exitApp)
   void exitApp() noexcept;
   REACT_METHOD(addListener)
@@ -45,6 +57,8 @@ private:
   WNDPROC                                    m_oldProc{ nullptr };
   int                                        m_lastCmdId{ 100 };
   std::map<int, std::string>                 m_idMap;
+  HMENU                                      m_menuBar{ nullptr };
+  std::map<std::string, HMENU>               m_menuMap;
 
   // Helper to subclass the window proc once the HWND is set
   void SubclassWindow() noexcept;

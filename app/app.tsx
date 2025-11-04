@@ -16,15 +16,10 @@ import {
   useColorScheme,
   View,
   Alert,
+  Button,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import {Colors, Header} from 'react-native/Libraries/NewAppScreen';
 
 // Import and initialize the native menu turbo module
 import {} from 'react-native';
@@ -68,6 +63,7 @@ function App(): React.JSX.Element {
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
+    flex: 1,
   };
 
   /*
@@ -98,28 +94,21 @@ function App(): React.JSX.Element {
       }
     });
 
-    MenuModule.initializeMenu([
-      {
-        id: 'file',
-        label: '&File',
-        submenu: [
-          {
-            type: 'item',
-            id: 'exit',
-            label: 'E&xit\tAlt+F4',
-          },
-        ],
-      },
-      {
-        id: 'help',
-        label: '&Help',
-        submenu: [
-          {type: 'item', id: 'updates', label: 'Check for updates...'},
-          {type: 'separator'},
-          {type: 'item', id: 'about', label: '&About\tF1'},
-        ],
-      },
-    ]);
+    // Build menu bar using primitives
+    MenuModule.clearMenu();
+
+    // File menu
+    MenuModule.addMenu('file', '&File');
+    MenuModule.addItem('file', 'preferences', '&Preferences');
+    MenuModule.enableMenu('preferences', false); // Disable Preferences
+    MenuModule.addSeparator('file');
+    MenuModule.addItem('file', 'exit', 'E&xit\tAlt+F4');
+
+    // Help menu
+    MenuModule.addMenu('help', '&Help');
+    MenuModule.addItem('help', 'updates', 'Check for updates...');
+    MenuModule.addSeparator('help');
+    MenuModule.addItem('help', 'about', '&About\tF1');
 
     // Cleanup the subscription on unmount
     return () => {
@@ -148,15 +137,13 @@ function App(): React.JSX.Element {
             {menuEvent ?? 'No menu event received yet.'}
           </Section>
           <Section title="See Your Changes">
-            <ReloadInstructions />
+            <Button
+              title="Toggle disabled menu"
+              onPress={() => {
+                MenuModule.enableMenu('preferences', false);
+              }}
+            />
           </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
         </View>
       </ScrollView>
     </View>
